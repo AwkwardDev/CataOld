@@ -1,7 +1,7 @@
-GRANT USAGE ON * . * TO 'cactusemu'@'localhost' IDENTIFIED BY 'cactusemu' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 ;
-CREATE DATABASE `world` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
-CREATE DATABASE `characters` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
-CREATE DATABASE `auth` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
-GRANT ALL PRIVILEGES ON `world` . * TO 'cactusemu'@'localhost' WITH GRANT OPTION;
-GRANT ALL PRIVILEGES ON `characters` . * TO 'cactusemu'@'localhost' WITH GRANT OPTION;
-GRANT ALL PRIVILEGES ON `auth` . * TO 'cactusemu'@'localhost' WITH GRANT OPTION;
+GRANT USAGE ON * . * TO 'root'@'localhost' IDENTIFIED BY 'cactusemu' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 ;
+CREATE DATABASE `cworld_old` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+CREATE DATABASE `ccharacters_old` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+CREATE DATABASE `cauth_old` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+GRANT ALL PRIVILEGES ON `cworld_old` . * TO 'root'@'localhost' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON `ccharacters_old` . * TO 'root'@'localhost' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON `cauth_old` . * TO 'root'@'localhost' WITH GRANT OPTION;

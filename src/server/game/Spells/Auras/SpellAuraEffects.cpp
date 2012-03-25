@@ -3086,6 +3086,58 @@ void AuraEffect::HandleModStealthDetect(AuraApplication const * aurApp, uint8 mo
 //TODO: Finish this aura
 void AuraEffect::HandleModTrapLauncher(AuraApplication const *aurApp, uint8 mode, bool apply) const
 {
+    if (!(mode & (AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK | AURA_EFFECT_HANDLE_STAT)))
+    return;
+
+    Player* target = aurApp->GetTarget()->ToPlayer();
+
+    if (!target || !target->IsInWorld())
+        return;
+
+    uint32 overrideId = GetAmount();
+
+    if (!overrideId)
+        return;
+
+    SpellEntry const* spell = sSpellStore.LookupEntry(overrideId);
+    if (!spell)
+        return;
+
+    if (target->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    // Using this way instead of shits load of if
+    PlayerSpellMap const& spellMap = target->ToPlayer()->GetSpellMap();
+    for (PlayerSpellMap::const_iterator i = spellMap.begin(); i != spellMap.end(); ++i) // Check every known spells for target, replace traps spells with launch traps spells.
+    {
+        if (i->second->active)
+        {
+            SpellEntry const* spellInfo = sSpellStore.LookupEntry(i->first);
+            if (!spellInfo)
+                return;
+
+            sLog->outDetail("Spell %u Effect %u FamilyFlags %u", spellInfo->Id, GetEffIndex(), GetBase()->GetEffect(GetEffIndex())->GetSpellProto()->SpellFamilyFlags);
+            if (GetSpellProto()->EffectSpellClassMask[GetEffIndex()] & spellInfo->SpellFamilyFlags)
+            {
+                if (apply)
+                {
+                    target->AddTemporarySpell(overrideId);
+                    WorldPacket data(SMSG_SUPERCEDED_SPELL, 4 + 4);
+                    data << uint32(spellInfo->Id); // here should be affected spell - not really necessary, after casting the real spell again, it auto-fixes
+                    data << uint32(overrideId);
+                    target->GetSession()->SendPacket(&data);
+                }
+                else
+                {
+                    target->RemoveTemporarySpell(overrideId);
+                    WorldPacket data(SMSG_SUPERCEDED_SPELL, 4 + 4);
+                    data << uint32(overrideId);
+                    data << uint32(spellInfo->Id); // here should be affected spell - not really necessary, after casting the real spell again, it auto-fixes
+                    target->GetSession()->SendPacket(&data);
+                }
+            }
+        }
+    }
 }
 
 //TODO: Finish this aura
