@@ -2313,6 +2313,15 @@ void Spell::EffectTriggerMissileSpell(SpellEffIndex effIndex)
     float x, y, z;
     m_targets.m_dstPos.GetPosition(x, y, z);
     m_caster->CastSpell(x, y, z, spellInfo->Id, true, m_CastItem, 0, m_originalCasterGUID);
+
+    
+    if (m_spellInfo->Id == 60192 || m_spellInfo->Id == 82939 || m_spellInfo->Id == 82941 || m_spellInfo->Id == 82945 || m_spellInfo->Id == 82948) // Hunter traps launcher spells
+    {
+        if (m_caster->HasAuraType(SPELL_AURA_MOD_TRAP_LAUNCHER))
+        {
+            m_caster->RemoveAurasDueToSpell(77769); // Remove Trap launcher buff on trap launch
+        }
+    }
 }
 
 void Spell::EffectJump(SpellEffIndex effIndex)

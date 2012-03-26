@@ -3116,7 +3116,6 @@ void AuraEffect::HandleModTrapLauncher(AuraApplication const *aurApp, uint8 mode
             if (!spellInfo)
                 return;
 
-            sLog->outDetail("Spell %u Effect %u FamilyFlags %u", spellInfo->Id, GetEffIndex(), GetBase()->GetEffect(GetEffIndex())->GetSpellProto()->SpellFamilyFlags);
             if (GetSpellProto()->EffectSpellClassMask[GetEffIndex()] & spellInfo->SpellFamilyFlags)
             {
                 if (apply)
