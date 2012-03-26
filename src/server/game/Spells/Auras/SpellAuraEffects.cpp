@@ -735,7 +735,18 @@ int32 AuraEffect::CalculateAmount(Unit *caster)
             }
             // Innervate
             else if (m_spellProto->Id == 29166)
-                amount = int32(GetBase()->GetUnitOwner()->GetCreatePowers(POWER_MANA) * amount / (GetTotalTicks() * 100.0f));
+            {
+                if (!caster)
+                    break;
+
+                if (caster == GetBase()->GetOwner()) // if caster is also the aura owner
+                {
+                    if (AuraEffect* dreamState= caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_DRUID, 2255, 0)) // Dreamstate
+                        amount += dreamState->GetAmount(); // +15 for rank 1, +30 for rank 2
+                }
+
+                amount = int32((caster->GetMaxPower(POWER_MANA) * (amount / 100.0f)) / GetTotalTicks()); // (Max mana * 20|35|50 %) / 10
+            }
             // Owlkin Frenzy
             else if (m_spellProto->Id == 48391)
                 amount = GetBase()->GetUnitOwner()->GetCreatePowers(POWER_MANA) * amount / 100;
