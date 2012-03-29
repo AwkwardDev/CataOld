@@ -3132,17 +3132,19 @@ void AuraEffect::HandleModTrapLauncher(AuraApplication const *aurApp, uint8 mode
                 if (apply)
                 {
                     target->AddTemporarySpell(overrideId);
-                    WorldPacket data(SMSG_SUPERCEDED_SPELL, 4 + 4);
+                    WorldPacket data(SMSG_SUPERCEDED_SPELL, 4 + 4 + 4);
                     data << uint32(spellInfo->Id); // here should be affected spell - not really necessary, after casting the real spell again, it auto-fixes
                     data << uint32(overrideId);
+                    data << uint32(0);
                     target->GetSession()->SendPacket(&data);
                 }
                 else
                 {
                     target->RemoveTemporarySpell(overrideId);
-                    WorldPacket data(SMSG_SUPERCEDED_SPELL, 4 + 4);
+                    WorldPacket data(SMSG_SUPERCEDED_SPELL, 4 + 4 + 4);
                     data << uint32(overrideId);
                     data << uint32(spellInfo->Id); // here should be affected spell - not really necessary, after casting the real spell again, it auto-fixes
+                    data << uint32(0);
                     target->GetSession()->SendPacket(&data);
                 }
             }
