@@ -678,7 +678,7 @@ void Spell::SpellDamageSchoolDmg(SpellEffIndex effIndex)
                             break;
                     }
                 }
-                /*// Shadow Word: Death - deals damage equal to damage done to caster
+                // Shadow Word: Death - deals damage equal to damage done to caster
                 if ((m_spellInfo->SpellFamilyFlags[1] & 0x2))
                 {
                     int32 back_damage = m_caster->SpellDamageBonus(unitTarget, m_spellInfo, effIndex, (uint32)damage, SPELL_DIRECT_DAMAGE);
@@ -688,7 +688,7 @@ void Spell::SpellDamageSchoolDmg(SpellEffIndex effIndex)
 
                     if (back_damage < int32(unitTarget->GetHealth()))
                         m_caster->CastCustomSpell(m_caster, 32409, &back_damage, 0, 0, true);
-                }*/
+                }
                 // Mind Blast - applies Mind Trauma if:
                 else if (m_spellInfo->Id == 8092)
                 {
