@@ -33,6 +33,7 @@ enum PriestSpells
     PRIEST_SPELL_PENANCE_R1                      = 47540,
     PRIEST_SPELL_PENANCE_R1_DAMAGE               = 47758,
     PRIEST_SPELL_PENANCE_R1_HEAL                 = 47757,
+    PRIEST_SPELL_SWD_RETURN                      = 32409,
 };
 
 // Guardian Spirit
@@ -297,6 +298,37 @@ class spell_priest_flash_heal : public SpellScriptLoader
         }
 };
 
+// Shadow word: Death 32379
+class spell_pri_shadow_word_death : public SpellScriptLoader
+{
+    public:
+        spell_pri_shadow_word_death() : SpellScriptLoader("spell_pri_shadow_word_death") { }
+
+        class spell_pri_shadow_word_death_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_pri_shadow_word_death_SpellScript)
+
+            void IsBelow25(SpellEffIndex /*effIndex*/)
+            {
+                if (Unit* target = GetTargetUnit())
+                {
+                    if (target->HealthBelowPct(25))
+                        SetHitDamage(GetHitDamage() * 3); // Deals three times as much damage to targets below 25% health.
+                }
+            }
+
+            void Register()
+            {
+                OnEffect += SpellEffectFn(spell_pri_shadow_word_death_SpellScript::IsBelow25, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+            }
+        };
+
+        SpellScript *GetSpellScript() const
+        {
+            return new spell_pri_shadow_word_death_SpellScript;
+        }
+};
+
 void AddSC_priest_spell_scripts()
 {
     new spell_pri_guardian_spirit();
@@ -305,4 +337,5 @@ void AddSC_priest_spell_scripts()
     new spell_pri_penance;
     new spell_pri_reflective_shield_trigger();
     new spell_priest_flash_heal;
+    new spell_pri_shadow_word_death;
 }
