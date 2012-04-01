@@ -8370,6 +8370,8 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, AuraEffect* trig
                         return false;
                     target = this;
                     basepoints0 = auraSpellInfo->EffectBasePoints[0];
+                    if (AuraEffect* aurEff = GetAuraEffect(SPELL_AURA_DUMMY,SPELLFAMILY_HUNTER,5080,1)) // One With Nature
+                        basepoints0 += aurEff->GetAmount();
                     trigger_spell_id = 82716;
                     break;
                 }
