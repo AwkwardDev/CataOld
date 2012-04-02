@@ -4440,10 +4440,6 @@ void SpellMgr::LoadSpellCustomAttr()
             spellInfo->EffectApplyAuraName[1] = SPELL_AURA_MOD_POWER_REGEN;
             count++;
             break;
-       case 55682: // Glyph of Shadow Word: Death
-           spellInfo->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
-           count++;
-           break;
         default:
             break;
         }
