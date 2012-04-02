@@ -33,6 +33,10 @@ enum PriestSpells
     PRIEST_SPELL_PENANCE_R1                      = 47540,
     PRIEST_SPELL_PENANCE_R1_DAMAGE               = 47758,
     PRIEST_SPELL_PENANCE_R1_HEAL                 = 47757,
+    PRIEST_SPELL_SWD                             = 32379,
+    PRIEST_SPELL_SWD_RETURN                      = 32409,
+    PRIEST_SPELL_SWD_GLYPH_MARKER                = 95652,
+    PRIEST_SPELL_SWD_GLYPH                       = 55682,
 };
 
 // Guardian Spirit
@@ -297,6 +301,59 @@ class spell_priest_flash_heal : public SpellScriptLoader
         }
 };
 
+// Shadow Word: Death
+// Spell Id: 32379
+class spell_pri_shadow_word_death : public SpellScriptLoader
+{
+    public:
+        spell_pri_shadow_word_death() : SpellScriptLoader("spell_pri_shadow_word_death") { }
+
+        class spell_pri_shadow_word_death_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_pri_shadow_word_death_SpellScript);
+
+            void DamageCaster(SpellEffIndex effIndex)
+            {
+                if (Unit* caster = GetCaster())
+                {
+                    Unit* target = GetHitUnit();
+                    if (!target)
+                        return;
+
+                    if (target->HealthBelowPct(25)) // Deals 3 times more damage to targets below 25% health
+                        SetHitDamage(GetHitDamage() * 3);
+
+                    int32 back_damage = GetHitDamage();
+                    if (AuraEffect* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 2874, 1)) // Pain and Suffering reduces damage
+                        back_damage -= aurEff->GetAmount() * back_damage / 100;
+
+                    if (back_damage < (int32)target->GetHealth()) // If SWD dont kill de target
+                        caster->CastCustomSpell(caster, PRIEST_SPELL_SWD_RETURN, &back_damage, NULL, NULL, true);
+
+                    if (Aura* swdGlyph = caster->GetAura(PRIEST_SPELL_SWD_GLYPH)) // Glyph of Shadow word: death
+                    {
+                        if (target->HealthBelowPct(swdGlyph->GetSpellProto()->EffectBasePoints[0]) && !target->HasAura(PRIEST_SPELL_SWD_GLYPH_MARKER)) // If target health is below 25% and doesn't have aura with 6 secs duration used as cooldown.
+                        {
+                            caster->AddAura(PRIEST_SPELL_SWD_GLYPH_MARKER, target); // Spell used as a cooldown
+                            if (Player* plr = caster->ToPlayer())
+                                plr->RemoveSpellCooldown(PRIEST_SPELL_SWD, true);
+                        }
+                    }
+                }
+            }
+
+            void Register()
+            {
+                OnEffect += SpellEffectFn(spell_pri_shadow_word_death_SpellScript::DamageCaster, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_pri_shadow_word_death_SpellScript;
+        }
+};
+
 void AddSC_priest_spell_scripts()
 {
     new spell_pri_guardian_spirit();
@@ -305,4 +362,5 @@ void AddSC_priest_spell_scripts()
     new spell_pri_penance;
     new spell_pri_reflective_shield_trigger();
     new spell_priest_flash_heal;
+    new spell_pri_shadow_word_death();
 }

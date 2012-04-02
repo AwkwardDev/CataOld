@@ -678,19 +678,6 @@ void Spell::SpellDamageSchoolDmg(SpellEffIndex effIndex)
                             break;
                     }
                 }
-                // Shadow Word: Death - deals damage equal to damage done to caster
-                if ((m_spellInfo->SpellFamilyFlags[1] & 0x2))
-                {
-                    if (unitTarget->HealthBelowPct(25)) // Deals three times as much damage to targets below 25% health.  Not sure if should return 3x stronger ?
-                        damage *= 3;
-                    int32 back_damage = m_caster->SpellDamageBonus(unitTarget, m_spellInfo, effIndex, (uint32)damage, SPELL_DIRECT_DAMAGE);
-                    // Pain and Suffering reduces damage
-                    if (AuraEffect * aurEff = m_caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 2874, 0))
-                        back_damage -= aurEff->GetAmount() * back_damage / 100;
-
-                    if (back_damage < int32(unitTarget->GetHealth()))
-                        m_caster->CastCustomSpell(m_caster, 32409, &back_damage, 0, 0, true);
-                }
                 // Mind Blast - applies Mind Trauma if:
                 else if (m_spellInfo->Id == 8092)
                 {
