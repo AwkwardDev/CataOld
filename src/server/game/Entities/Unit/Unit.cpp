@@ -8305,6 +8305,24 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, AuraEffect* trig
                     if (AuraEffect * aurEff = target->GetAuraEffect(trigger_spell_id, 0))
                         basepoints0 += aurEff->GetAmount();
                 }
+
+                if (auraSpellInfo->Id == 55682) // Glyph of Shadow Word: Death
+                {
+                    Player* plr = ToPlayer();
+                    if (!plr)
+                        return false;
+                    Unit* target = plr->GetSelectedUnit();
+                    if (!target)
+                        return false;
+
+                    if (cooldown && plr->HasSpellCooldown(auraSpellInfo->Id))
+                        return false;
+                    if (plr->HasSpellCooldown(32379) && !target->isDead() && target->HealthBelowPct(auraSpellInfo->EffectBasePoints[0]))
+                        plr->RemoveSpellCooldown(32379, true); // Remove Shadow Word: Death cooldown
+
+                    plr->AddSpellCooldown(55682, 0, time(NULL) + cooldown);
+                    return true;
+                }
                 break;
             }
             case SPELLFAMILY_DRUID:
