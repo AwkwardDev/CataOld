@@ -6114,14 +6114,6 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, AuraEffect* trigger
                 triggered_spell_id = 47753;
                 break;
             }
-            //Mind Melt
-            case 87160:
-            case 81292:
-            {
-                if (procSpell->Id != 73510)
-                    return false;
-                break;
-            }
             // Body and Soul
             if (dummySpell->SpellIconID == 2218)
             {
@@ -6134,6 +6126,14 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, AuraEffect* trigger
             }
             switch(dummySpell->Id)
             {
+                //Mind Melt
+                case 87160:
+                case 81292:
+                {
+                    if (procSpell->Id != 73510)
+                        return false;
+                    break;
+                }
                 // Vampiric Embrace
                 case 15286:
                 {
@@ -6186,7 +6186,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, AuraEffect* trigger
                     basepoints0 = damage * triggerAmount / tickcount / 100;
                     break;
                 }
-                // Improved Shadowform
+                // Phantasm
                 case 47570:
                 case 47569:
                 {
