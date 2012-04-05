@@ -6754,7 +6754,6 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, AuraEffect* trigger
                 {
                     if (roll_chance_f(triggerAmount))
                     {
-                        triggerAmount = 100;
                         target = this;
                         triggered_spell_id = 90174;
                         break;
