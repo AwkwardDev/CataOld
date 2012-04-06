@@ -8804,6 +8804,10 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, AuraEffect* trig
             target = pVictim;
             break;
         }
+        case 89488: // Strength of soul (Rank 1)
+        case 89489: // Strength of soul (Rank 2)
+            basepoints0 = auraSpellInfo->EffectBasePoints[0];
+            break;
         default:
             break;
     }

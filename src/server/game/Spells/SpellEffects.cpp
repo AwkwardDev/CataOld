@@ -6128,6 +6128,28 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
             }
             break;
         }
+        case SPELLFAMILY_PRIEST:
+        {
+            switch(m_spellInfo->Id)
+            {
+                case 89490: // Strength of soul
+                {
+                    if (!unitTarget)
+                        return;
+
+                    if (Aura* weakenedSoul = unitTarget->GetAura(6788, m_caster->GetGUID()))
+                    {
+                        int32 newDuration = weakenedSoul->GetDuration() - (m_spellValue->EffectBasePoints[effIndex] * IN_MILLISECONDS);
+                        if (newDuration > 0)
+                            weakenedSoul->SetDuration(newDuration);
+                        else
+                            weakenedSoul->Remove(AURA_REMOVE_BY_EXPIRE);
+                    }
+                    break;
+                }
+            }
+            break;
+        }
     }
 
     // normal DB scripted effect
