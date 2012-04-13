@@ -276,6 +276,59 @@ public:
     }
 };
 
+// Combustion 11129, (Dot 83853)
+class spell_mage_combustion : public SpellScriptLoader
+{
+public:
+    spell_mage_combustion() : SpellScriptLoader("spell_mage_combustion") { }
+
+    class spell_mage_combustion_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_mage_combustion_AuraScript);
+
+        void CalcDamage(AuraEffect const* /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
+        {
+            Unit* target = GetUnitOwner();
+
+            if (!target)
+                return;
+
+            static const AuraType diseaseAuraTypes[] =
+            {
+                SPELL_AURA_PERIODIC_DAMAGE,
+                SPELL_AURA_PERIODIC_DAMAGE_PERCENT,
+                SPELL_AURA_NONE
+            };
+
+            uint32 dots = 0;
+            for (AuraType const* itr = &diseaseAuraTypes[0]; itr && itr[0] != SPELL_AURA_NONE; ++itr)
+            {
+                Unit::AuraEffectList const& auras = target->GetAuraEffectsByType(*itr);
+                for (Unit::AuraEffectList::const_iterator i = auras.begin(); i != auras.end(); ++i)
+                {
+                    if ((*i)->GetCasterGUID() != GetCasterGUID())
+                        continue;
+
+                    dots += ((*i)->GetAmount() * (*i)->GetTotalTicks()) / ((*i)->GetBase()->GetMaxDuration() / IN_MILLISECONDS);
+                }
+            }
+
+            amount = dots;
+        }
+
+        void Register()
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_mage_combustion_AuraScript::CalcDamage, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+        }
+    };
+
+    AuraScript *GetAuraScript() const
+    {
+        return new spell_mage_combustion_AuraScript();
+    }
+};
+
+
 void AddSC_mage_spell_scripts()
 {
     new spell_mage_cold_snap;
@@ -283,4 +336,5 @@ void AddSC_mage_spell_scripts()
     new spell_mage_incanters_absorbtion_absorb();
     new spell_mage_incanters_absorbtion_manashield();
     new spell_mage_polymorph_cast_visual;
+    new spell_mage_combustion();
 }
