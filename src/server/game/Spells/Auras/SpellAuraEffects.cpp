@@ -564,14 +564,10 @@ int32 AuraEffect::CalculateAmount(Unit *caster)
                     break;
                 case SPELLFAMILY_PRIEST:
                     // Power Word: Shield
-                    if (GetSpellProto()->SpellFamilyFlags[0] & 0x1 && GetSpellProto()->SpellFamilyFlags[2] & 0x400)
+                    if (GetSpellProto()->SpellFamilyFlags[0] & 0x1)
                     {
-                        //+80.68% from sp bonus
-                        float bonus = 0.8068f;
-
-                        // Borrowed Time
-                        if (AuraEffect const* pAurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PRIEST, 2899, 1))
-                            bonus += (float)pAurEff->GetAmount() / 100.0f;
+                        //+87.2% from sp bonus (OLD +80.68% From 3.3.5 ?)
+                        float bonus = 0.872f;
 
                         DoneActualBenefit += caster->SpellBaseHealingBonus(GetSpellSchoolMask(m_spellProto)) * bonus;
                         // Improved PW: Shield: its weird having a SPELLMOD_ALL_EFFECTS here but its blizzards doing :)
