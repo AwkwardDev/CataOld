@@ -5690,28 +5690,6 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, AuraEffect* trigger
                 break;
             }
 
-            // Hot Streak
-            if (dummySpell->SpellIconID == 2999)
-            {
-                if (effIndex != 0)
-                    return false;
-                AuraEffect *counter = triggeredByAura->GetBase()->GetEffect(1);
-                if (!counter)
-                    return true;
-
-                // Count spell criticals in a row in second aura
-                if (procEx & PROC_EX_CRITICAL_HIT)
-                {
-                    counter->SetAmount(counter->GetAmount()*2);
-                    if (counter->GetAmount() < 100) // not enough
-                        return true;
-                    // Crititcal counted -> roll chance
-                    if (roll_chance_i(triggerAmount))
-                       CastSpell(this, 48108, true, castItem, triggeredByAura);
-                }
-                counter->SetAmount(25);
-                return true;
-            }
             // Burnout
             if (dummySpell->SpellIconID == 2998)
             {
@@ -5738,6 +5716,55 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, AuraEffect* trigger
             }
             switch(dummySpell->Id)
             {
+                case 44445: // Hot Streak
+                {
+                    if (effIndex != 0)
+                        return false;
+
+                    int critChance = (int)GetFloatValue(PLAYER_SPELL_CRIT_PERCENTAGE1 + GetFirstSchoolInMask(GetSpellSchoolMask(dummySpell)));
+
+                    // e.g. (100 - 30) * (100 / 30) = 233 / 20 = 11.65
+                    // e.g. (100 - 10) * (100 / 10) = 900 / 20 = 45
+                    // More crit chance = less proc chance
+                    int procChance = ((100 - critChance) * (100 / critChance))/20;
+
+                    if (procChance > 80) // Max 80 %
+                        procChance = 80;
+                    else if (procChance < 5) // Min 5%
+                        procChance = 5;
+
+                    if (roll_chance_i(procChance))
+                    {
+                        CastSpell(this, 48108, true, castItem, triggeredByAura);
+                        return true;
+                    }
+
+                    return false;
+                }
+                // Improved Hot Streak
+                // Used if (SpellIconID = 2999) but "44445 Hot Streak (Rank 1)" has the same iconId
+                case 44446: // Rank1
+                case 44448: // Rank2
+                {
+                    if (effIndex != 0)
+                        return false;
+                    AuraEffect *counter = triggeredByAura->GetBase()->GetEffect(1);
+                    if (!counter)
+                        return true;
+
+                    // Count spell criticals in a row in second aura
+                    if (procEx & PROC_EX_CRITICAL_HIT)
+                    {
+                        counter->SetAmount(counter->GetAmount()*2);
+                        if (counter->GetAmount() < 100) // not enough
+                            return true;
+                        // Crititcal counted -> roll chance
+                        if (roll_chance_i(triggerAmount))
+                           CastSpell(this, 48108, true, castItem, triggeredByAura);
+                    }
+                    counter->SetAmount(25);
+                    return true;
+                }
                 //Nether Vortex
                 case 86181:
                 case 86209:
@@ -6075,6 +6102,14 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, AuraEffect* trigger
                 {
                     triggered_spell_id = 37378;
                     break;
+                }
+                // Glyph of seduction
+                case 56250:
+                {
+                    target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, 0, target->GetAura(32409)); // SW:D shall not be removed.
+                    target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
+                    target->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
+                    return true;
                 }
             }
             break;
@@ -6498,6 +6533,14 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, AuraEffect* trigger
 
                     triggered_spell_id = 32747;
                     break;
+                }
+                // Glyph of blind
+                case 91299:
+                {
+                    target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, 0, target->GetAura(32409)); // SW:D shall not be removed.
+                    target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
+                    target->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
+                    return true;
                 }
             }
             // Cut to the Chase
