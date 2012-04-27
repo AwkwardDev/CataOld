@@ -5723,10 +5723,10 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, AuraEffect* trigger
 
                     int critChance = (int)GetFloatValue(PLAYER_SPELL_CRIT_PERCENTAGE1 + GetFirstSchoolInMask(GetSpellSchoolMask(dummySpell)));
 
-                    // e.g. (100 - 30) * (100 / 30) = 233 / 20 = 11.65
-                    // e.g. (100 - 10) * (100 / 10) = 900 / 20 = 45
+                    // e.g. (100 - 30) * (100 / 30) = 233 / 15 = 15.5
+                    // e.g. (100 - 10) * (100 / 10) = 900 / 15 = 60
                     // More crit chance = less proc chance
-                    int procChance = ((100 - critChance) * (100 / critChance))/20;
+                    int procChance = ((100 - critChance) * (100 / critChance))/15;
 
                     if (procChance > 80) // Max 80 %
                         procChance = 80;
