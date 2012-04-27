@@ -29,7 +29,8 @@ public:
 
     void OnSpellCastWithProto(Player* player, SpellEntry const *spellProto)
     {
-        if (player->getClass() == CLASS_MAGE && spellProto->Id != 7268 && spellProto->Id != 5143 && !player->HasAura(79683))
+        if (player->getClass() == CLASS_MAGE && spellProto->Id != 7268 && spellProto->Id != 5143 && !player->HasAura(79683)
+            && !player->HasAura(44445)) // Hot Streak
         {
             if (SpellEffectEntry const* spellEffect = spellProto->GetSpellEffect(EFFECT_0))
             {
