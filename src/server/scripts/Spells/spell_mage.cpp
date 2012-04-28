@@ -39,7 +39,8 @@ enum MageSpells
     SPELL_MAGE_GLYPH_OF_ETERNAL_WATER            = 70937,
     SPELL_MAGE_SUMMON_WATER_ELEMENTAL_PERMANENT  = 70908,
     SPELL_MAGE_SUMMON_WATER_ELEMENTAL_TEMPORARY  = 70907,
-    SPELL_MAGE_GLYPH_OF_BLAST_WAVE               = 62126
+    SPELL_MAGE_GLYPH_OF_BLAST_WAVE               = 62126,
+    SPELL_MAGE_CAUTERIZE_DOT                     = 87023,
 };
 
 class spell_mage_cold_snap : public SpellScriptLoader
@@ -328,6 +329,61 @@ public:
     }
 };
 
+// Cauterize 86948, 86949
+class spell_mage_cauterize : public SpellScriptLoader
+{
+public:
+    spell_mage_cauterize() : SpellScriptLoader("spell_mage_cauterize") { }
+
+    class spell_mage_cauterize_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_mage_cauterize_AuraScript);
+
+        uint32 absorbChance;
+        uint32 healthPct;
+
+        bool Load()
+        {
+            absorbChance = SpellMgr::CalculateSpellEffectAmount(GetSpellProto(), EFFECT_0);
+            healthPct = SpellMgr::CalculateSpellEffectAmount(GetSpellProto(), EFFECT_1);
+            return GetUnitOwner()->ToPlayer();
+        }
+
+        void CalculateAmount(AuraEffect const * /*aurEff*/, int32 & amount, bool & canBeRecalculated)
+        {
+            // Set absorbtion amount to unlimited
+            amount = -1;
+        }
+
+        void Absorb(AuraEffect * aurEff, DamageInfo & dmgInfo, uint32 & absorbAmount)
+        {
+            Unit * target = GetTarget();
+            if (dmgInfo.GetDamage() < target->GetHealth())
+                return;
+            if (target->ToPlayer()->HasSpellCooldown(SPELL_MAGE_CAUTERIZE_DOT))
+                return;
+            if (!roll_chance_i(absorbChance))
+                return;
+
+            target->SetHealth(target->CountPctFromMaxHealth(healthPct)); // Set hp to 40%
+            target->CastSpell(target, SPELL_MAGE_CAUTERIZE_DOT, true);
+            target->ToPlayer()->AddSpellCooldown(SPELL_MAGE_CAUTERIZE_DOT, 0, time(NULL) + 60);
+            absorbAmount = dmgInfo.GetDamage();
+        }
+
+        void Register()
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_mage_cauterize_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
+            OnEffectAbsorb += AuraEffectAbsorbFn(spell_mage_cauterize_AuraScript::Absorb, EFFECT_0);
+        }
+    };
+
+    AuraScript *GetAuraScript() const
+    {
+        return new spell_mage_cauterize_AuraScript();
+    }
+};
+
 
 void AddSC_mage_spell_scripts()
 {
@@ -337,4 +393,5 @@ void AddSC_mage_spell_scripts()
     new spell_mage_incanters_absorbtion_manashield();
     new spell_mage_polymorph_cast_visual;
     new spell_mage_combustion();
+    new spell_mage_cauterize();
 }
